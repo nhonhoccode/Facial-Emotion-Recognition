@@ -33,3 +33,4 @@ urlpatterns = [
 # For other static files, use Django's built-in static file server
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
