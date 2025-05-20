@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhận Diện Cảm Xúc Qua Webcam</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .webcam-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .video-feed {
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+        }
+        .controls {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .btn-primary {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
+        .btn-primary:hover {
+            background-color: #5649c0;
+            border-color: #5649c0;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        .camera-error {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #ffebee;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #local-webcam {
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Nhận Diện Cảm Xúc Qua Webcam</h1>
+            <p class="lead">Ứng dụng sẽ phân tích cảm xúc khuôn mặt của bạn theo thời gian thực</p>
+        </div>
+        
+        <div class="webcam-container">
+            <div class="webcam-view">                <!-- Server-side camera feed -->
+                <img src="{% url 'webcam_feed' %}" class="video-feed" id="video-feed" alt="Camera feed for emotion detection">
+                
+                <!-- Fallback to browser API if server feed fails -->
+                <video id="local-webcam" autoplay playsinline></video>
+                
+                <!-- Error message if both camera methods fail -->
+                <div class="camera-error" id="camera-error">
+                    <div class="alert alert-danger">
+                        <h5>Không thể kết nối với webcam</h5>
+                        <p>Lỗi kết nối webcam. Vui lòng kiểm tra các nguyên nhân sau:</p>
+                        <ul class="text-start">
+                            <li>Đảm bảo máy tính của bạn có webcam và đang hoạt động</li>
+                            <li>Cho phép trình duyệt truy cập webcam khi được yêu cầu</li>
+                            <li>Đảm bảo không có ứng dụng khác đang sử dụng webcam</li>
+                        </ul>
+                        <button class="btn btn-primary mt-2" id="retry-btn">Thử lại</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <p>Ứng dụng đang phân tích cảm xúc khuôn mặt của bạn theo thời gian thực. Đảm bảo khuôn mặt của bạn nằm trong khung hình và có đủ ánh sáng để có kết quả chính xác nhất.</p>
+            </div>
+            
+            <div class="controls">
+                <a href="{% url 'home' %}" class="btn btn-primary" id="back-btn">Quay lại trang chủ</a>
+                <button class="btn btn-danger" id="stop-btn">Dừng Webcam</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const serverFeed = document.getElementById('video-feed');
+        const localWebcam = document.getElementById('local-webcam');
+        const cameraError = document.getElementById('camera-error');
+        const retryBtn = document.getElementById('retry-btn');
+        
+        // Check if server feed loads properly
+        serverFeed.addEventListener('error', function() {
+            console.log('Server camera feed failed, trying browser API');
+            serverFeed.style.display = 'none';
+            
+            // Try browser's getUserMedia API as fallback
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function(stream) {
+                        localWebcam.style.display = 'block';
+                        localWebcam.srcObject = stream;
+                    })
+                    .catch(function(error) {
+                        console.error("Couldn't access webcam: ", error);
+                        localWebcam.style.display = 'none';
+                        cameraError.style.display = 'block';
+                    });
+            } else {
+                cameraError.style.display = 'block';
+            }
+        });
+        
+        // Retry button handler
+        retryBtn.addEventListener('click', function() {
+            location.reload();
+        });
+          // Stop button handler
+        document.getElementById('stop-btn').addEventListener('click', function() {
+            // Disable the button to prevent multiple clicks
+            this.disabled = true;
+            this.innerHTML = 'Đang dừng...';
+            
+            // Stop local browser webcam if it's active
+            if (localWebcam.srcObject) {
+                localWebcam.srcObject.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+            
+            // Stop the webcam stream from server
+            fetch('{% url "stop_webcam" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Webcam stopped successfully');
+                // Redirect to home page
+                window.location.href = '{% url "home" %}';
+            })
+            .catch(error => {
+                console.error('Error stopping webcam:', error);
+                // Even if there's an error, redirect to home page
+                window.location.href = '{% url "home" %}';            });
+        });
+        
+        // Handle page unload to properly stop the webcam
+        window.addEventListener('beforeunload', function() {
+            fetch('{% url "stop_webcam" %}');
+            // Also stop local browser webcam if it's active
+            if (localWebcam.srcObject) {
+                localWebcam.srcObject.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

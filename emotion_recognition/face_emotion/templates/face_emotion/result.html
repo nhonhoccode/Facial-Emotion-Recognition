@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Nhận Diện</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .result-container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .image-container {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .image-container img {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .emotion-label {
+            font-weight: bold;
+            color: #6c5ce7;
+        }
+        .btn-primary {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
+        .btn-primary:hover {
+            background-color: #5649c0;
+            border-color: #5649c0;
+        }
+        .results-table {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Kết Quả Nhận Diện Cảm Xúc</h1>
+        </div>
+        
+        <div class="result-container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="image-container">
+                        <h4>Ảnh Gốc</h4>
+                        <img src="{{ original_image }}" alt="Original Image" class="img-fluid">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="image-container">
+                        <h4>Kết Quả Nhận Diện</h4>
+                        <img src="{{ result_image }}" alt="Result Image" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    {% if no_face %}
+                        <div class="alert alert-warning">
+                            <h4 class="alert-heading">Không tìm thấy khuôn mặt!</h4>
+                            <p>Không phát hiện khuôn mặt nào trong ảnh. Vui lòng thử lại với ảnh khác.</p>
+                        </div>
+                    {% else %}
+                        <h3>Chi tiết kết quả:</h3>
+                        <table class="table table-striped results-table">
+                            <thead>
+                                <tr>
+                                    <th>Khuôn mặt</th>
+                                    <th>Cảm xúc</th>
+                                    <th>Độ tin cậy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>Khuôn mặt #{{ forloop.counter }}</td>
+                                    <td class="emotion-label">{{ result.emotion }}</td>
+                                    <td>{{ result.confidence|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'home' %}" class="btn btn-primary">Phân tích ảnh khác</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

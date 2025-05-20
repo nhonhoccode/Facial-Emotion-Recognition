@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhận Diện Cảm Xúc - Trang Chủ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #4834d4;
+            --accent-color: #ff7675;
+            --light-bg: #f8f9fa;
+            --dark-text: #343a40;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .header {
+            text-align: center;
+            margin: 3rem 0;
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .main-title {
+            color: var(--dark-text);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 2rem;
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .upload-area {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .stats-label {
+            color: var(--dark-text);
+            font-weight: 500;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-success {
+            color: #20bf6b;
+            border-color: #20bf6b;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-success:hover {
+            background-color: #20bf6b;
+            border-color: #20bf6b;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .sample-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .sample-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .footer {
+            background-color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer-text {
+            color: var(--dark-text);
+        }
+        
+        .feature-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .feature-description {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-brain me-2"></i>
+                Facial Emotion AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i> Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'webcam' %}">
+                            <i class="fas fa-camera me-1"></i> Webcam
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'video_upload' %}">
+                            <i class="fas fa-video me-1"></i> Xử lý Video
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="container">
+        <div class="header">
+            <h1 class="main-title">Hệ Thống Nhận Diện Cảm Xúc Khuôn Mặt</h1>
+            <p class="lead">Sử dụng trí tuệ nhân tạo để phân tích cảm xúc từ khuôn mặt con người</p>
+        </div>
+
+        <!-- Statistics Dashboard -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="stats-number">7</div>
+                    <div class="stats-label">Loại cảm xúc</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="stats-number">3</div>
+                    <div class="stats-label">Mô hình kết hợp</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stats-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="stats-number">99%</div>
+                    <div class="stats-label">Hiệu suất xử lý</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Features -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card">
+                    <div class="card-header">
+                        <i class="fas fa-image me-2"></i> Phân tích Ảnh
+                    </div>
+                    <div class="card-body">
+                        <div class="feature-description mb-3">
+                            <p>Tải lên ảnh có chứa khuôn mặt để phân tích và nhận diện cảm xúc. Chỉ trong vài giây, hệ thống sẽ xác định khuôn mặt và phân loại theo 7 cảm xúc cơ bản.</p>
+                        </div>
+                        <form method="post" action="{% url 'detect_emotion' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ form.image.id_for_label }}" class="form-label">{{ form.image.label }}</label>
+                                {{ form.image }}
+                                {% if form.image.errors %}
+                                <div class="alert alert-danger mt-2">
+                                    {{ form.image.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted small">Hỗ trợ các định dạng ảnh: JPG, PNG, JPEG</p>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Phân tích cảm xúc
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card">
+                    <div class="card-header">
+                        <i class="fas fa-camera me-2"></i> Webcam trực tiếp
+                    </div>
+                    <div class="card-body">
+                        <div class="feature-description mb-3">
+                            <p>Sử dụng webcam của bạn để phân tích cảm xúc theo thời gian thực. Hệ thống sẽ tự động phát hiện và xác định cảm xúc của khuôn mặt trong khung hình webcam.</p>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1587614382346-4ec70e388b28?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="img-fluid rounded mb-3" alt="Webcam demo">
+                        <div class="d-grid">
+                            <a href="{% url 'webcam' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-camera me-2"></i>Sử dụng Webcam
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card">
+                    <div class="card-header">
+                        <i class="fas fa-video me-2"></i> Xử lý Video
+                    </div>
+                    <div class="card-body">
+                        <div class="feature-description mb-3">
+                            <p>Tải lên video và để hệ thống phân tích các cảm xúc thay đổi trong suốt thời gian. Phù hợp cho nghiên cứu về cảm xúc và phân tích biểu cảm.</p>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1576633587382-13ddf37b1fc1?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" class="img-fluid rounded mb-3" alt="Video demo">
+                        <div class="d-grid">
+                            <a href="{% url 'video_upload' %}" class="btn btn-outline-success">
+                                <i class="fas fa-video me-2"></i>Xử lý Video
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sample Images Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-images me-2"></i> Mẫu cảm xúc
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <p>Các ví dụ về 7 cảm xúc cơ bản mà hệ thống có thể nhận diện:</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 col-md-2 mb-3">
+                        <div class="text-center">
+                            <img src="../../../media/images/happy.png" class="sample-img" alt="Happy">
+                            <p class="small mt-2">Vui vẻ</p>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2 mb-3">
+                        <div class="text-center">
+                            <img src="../../../media/images/sadness.png" class="sample-img" alt="Sad">
+                            <p class="small mt-2">Buồn bã</p>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2 mb-3">
+                        <div class="text-center">
+                            <img src="../../../media/images/anger.png" class="sample-img" alt="Anger">
+                            <p class="small mt-2">Giận dữ</p>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2 mb-3">
+                        <div class="text-center">
+                            <img src="../../../media/images/surprise.png" class="sample-img" alt="Surprise">
+                            <p class="small mt-2">Ngạc nhiên</p>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2 mb-3">
+                        <div class="text-center">
+                            <img src="../../../media/images/fear.png" class="sample-img" alt="Fear">
+                            <p class="small mt-2">Sợ hãi</p>
+                        </div>
+                    </div>
+                    <div class="col-4 col-md-2 mb-3">
+                        <div class="text-center">
+                            <img src="../../../media/images/disgust.png" class="sample-img" alt="Disgust">
+                            <p class="small mt-2">Ghê tởm</p>
+                        </div>
+                    </div>
+                        <div class="col-4 col-md-2 mb-3">
+                              <div class="text-center">
+                              <img src="../../../media/images/contempt.png" class="sample-img" alt="Contempt">
+                              <p class="small mt-2">Khinh miệt</p>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">&copy; 2025 Facial Emotion Recognition. Powered by AI.</p>
+            <div class="social-links mt-2">
+                <a href="#" class="btn btn-sm btn-outline-primary me-2"><i class="fab fa-github"></i></a>
+                <a href="#" class="btn btn-sm btn-outline-primary me-2"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="btn btn-sm btn-outline-primary"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Xử Lý Video</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://vjs.zencdn.net/8.5.2/video-js.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .result-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .video-container {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+        video {
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
+        .btn-primary:hover {
+            background-color: #5649c0;
+            border-color: #5649c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Kết Quả Nhận Diện Cảm Xúc Trong Video</h1>
+            <p class="lead">Video đã được xử lý và gán nhãn cảm xúc cho từng khuôn mặt</p>
+        </div>
+        
+        <div class="result-container">            <div class="video-container">                <!-- Primary video player -->
+                <video
+                    id="emotion-video"
+                    class="video-js vjs-default-skin vjs-big-play-centered"
+                    controls
+                    preload="auto"
+                    width="640"
+                    height="360"
+                    data-setup='{"techOrder": ["html5"]}'
+                >
+                    <!-- Try with multiple sources for better compatibility -->
+                    <source src="{{ video_url }}" type="{{ mime_type|default:'video/mp4' }}" />
+                    <source src="{{ video_url }}" type="video/mp4" />
+                    <source src="{{ video_url }}" type="video/x-msvideo" />
+                    <source src="{{ video_url }}" type="video/avi" />
+                    <p class="vjs-no-js">
+                        Để xem video này, vui lòng bật JavaScript và cân nhắc nâng cấp trình duyệt
+                        <a href="https://videojs.com/html5-video-support/" target="_blank">hỗ trợ HTML5 video</a>
+                    </p>
+                </video>
+                
+                <!-- Fallback native HTML5 video player (hidden by default) -->
+                <video id="native-player" controls style="display:none; width:100%; margin-top:15px;">
+                    <source src="{{ video_url }}" type="{{ mime_type|default:'video/mp4' }}">
+                    <source src="{{ video_url }}" type="video/mp4">
+                    <source src="{{ video_url }}" type="video/x-msvideo">
+                    Trình duyệt của bạn không hỗ trợ video HTML5.
+                </video>                  <div id="download-container" class="text-center mt-3" style="display:none;">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Lưu ý:</strong> Có lỗi khi phát video. Vui lòng tải xuống và mở bằng trình phát media trên máy tính của bạn.
+                    </div>
+                    <a href="{{ video_url }}" class="btn btn-success" download="processed_video{% if video_url|slice:'-4:' == '.mp4' %}.mp4{% else %}.avi{% endif %}" aria-label="Tải xuống video đã xử lý">Tải xuống video</a>
+                </div>
+                
+                <p class="text-center small">Video gốc: {{ original_name }}</p>
+            </div>
+              <div class="info-section mb-4">
+                <h4>Thông tin về kết quả xử lý:</h4>
+                <ul>
+                    <li>Video đã được xử lý để nhận diện cảm xúc trên các khuôn mặt được phát hiện.</li>
+                    <li>Các cảm xúc được nhận diện gồm: Giận dữ, Khinh miệt, Ghê tởm, Sợ hãi, Vui vẻ, Buồn bã, Ngạc nhiên.</li>
+                    <li>Hiệu suất xử lý có thể thay đổi tùy thuộc vào độ phức tạp của video và số lượng khuôn mặt.</li>
+                </ul>                <div class="text-center mt-3">
+                    <a href="{{ video_url }}" class="btn btn-success" download="processed_video{% if video_url|slice:'-4:' == '.mp4' %}.mp4{% else %}.avi{% endif %}">Tải xuống video đã xử lý</a>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="{% url 'video_upload' %}" class="btn btn-primary">Xử lý video khác</a>
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary ms-2">Quay lại trang chủ</a>
+            </div>
+        </div>    </div>    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script>    <script>
+        // Debug info - print to console for troubleshooting
+        console.log('Video URL:', '{{ video_url }}');
+        console.log('MIME Type:', '{{ mime_type }}');
+        
+        // Also add visible debug info for troubleshooting
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add debug div
+            var debugDiv = document.createElement('div');
+            debugDiv.style.border = '1px solid #ccc';
+            debugDiv.style.margin = '10px 0';
+            debugDiv.style.padding = '10px';
+            debugDiv.style.backgroundColor = '#f8f8f8';
+            debugDiv.style.fontFamily = 'monospace';
+            debugDiv.style.fontSize = '12px';
+            debugDiv.style.whiteSpace = 'pre-wrap';
+            debugDiv.style.display = 'none'; // Hidden by default
+            
+            debugDiv.innerHTML = 'DEBUG INFO (click to hide):<br>' + 
+                                 'Video URL: {{ video_url }}<br>' +
+                                 'MIME Type: {{ mime_type }}<br>' +
+                                 'Download URL: {{ download_url }}';
+            
+            var toggleButton = document.createElement('button');
+            toggleButton.textContent = 'Show Debug Info';
+            toggleButton.className = 'btn btn-sm btn-secondary';
+            toggleButton.onclick = function() {
+                if (debugDiv.style.display === 'none') {
+                    debugDiv.style.display = 'block';
+                    this.textContent = 'Hide Debug Info';
+                } else {
+                    debugDiv.style.display = 'none';
+                    this.textContent = 'Show Debug Info';
+                }
+            };
+            
+            document.querySelector('.info-section').appendChild(toggleButton);
+            document.querySelector('.info-section').appendChild(debugDiv);
+        });
+        
+        // Initialize Video.js player with all options for maximum compatibility
+        var player = videojs('emotion-video', {
+            controls: true,
+            autoplay: false,
+            preload: 'auto',
+            fluid: true,
+            responsive: true,
+            playbackRates: [0.5, 1, 1.5, 2],
+            html5: {
+                vhs: {
+                    overrideNative: true
+                },
+                nativeVideoTracks: false,
+                nativeAudioTracks: false,
+                nativeTextTracks: false
+            },
+            techOrder: ['html5']
+        });
+        
+        var nativePlayer = document.getElementById('native-player');
+        var downloadContainer = document.getElementById('download-container');
+        var videoPlaybackFailed = false;
+        
+        // Function to handle video fetch errors
+        function checkVideoAvailability(url) {
+            fetch(url, { method: 'HEAD' })
+                .then(response => {
+                    console.log('Video HEAD response:', response.status, response.statusText);
+                    console.log('Content-Type:', response.headers.get('Content-Type'));
+                    
+                    if (!response.ok) {
+                        console.error('Video file not available:', response.status);
+                        videoPlaybackFailed = true;
+                        showFallbacks();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking video:', error);
+                    videoPlaybackFailed = true;
+                    showFallbacks();
+                });
+        }
+        
+        // Function to show fallbacks when video fails
+        function showFallbacks() {
+            // Hide the video.js player
+            document.getElementById('emotion-video').style.display = 'none';
+            if (player) player.dispose();
+            
+            // Try native HTML5 video player
+            nativePlayer.style.display = 'block';
+            
+            // Show download container
+            downloadContainer.style.display = 'block';
+            
+            // Try to play native player
+            nativePlayer.load();
+            nativePlayer.play().catch(function(e) {
+                console.log('Native player autoplay prevented:', e);
+            });
+        }
+        
+        // Check video availability
+        checkVideoAvailability('{{ video_url }}');
+        
+        // Show player dimensions for debugging
+        player.ready(function() {
+            console.log('Player ready, dimensions:', 
+                this.currentWidth() + 'x' + this.currentHeight(),
+                'readyState:', this.readyState());
+            
+            // Force the player to load and try to play
+            this.load();
+            
+            // Try to play after a short delay to help some browsers
+            setTimeout(function() {
+                player.play().catch(function(e) {
+                    console.log('Auto-play prevented by browser:', e);
+                });
+            }, 1000);
+        });
+          // Log any errors that occur with Video.js
+        player.on('error', function(e) {
+            console.log('Video.js playback error:', player.error(), e);
+            videoPlaybackFailed = true;
+            showFallbacks();
+        });
+        
+        // Track when video begins playing successfully
+        player.on('playing', function() {
+            console.log('Video is now playing successfully!');
+            videoPlaybackFailed = false;
+            
+            // Hide the download container if video is playing
+            downloadContainer.style.display = 'none';
+        });
+        
+        // Also track when metadata is loaded
+        player.on('loadedmetadata', function() {
+            console.log('Video metadata loaded, duration:', player.duration());
+        });
+        
+        // Also add error handling for native player
+        nativePlayer.addEventListener('error', function(e) {
+            console.log('Native player error:', nativePlayer.error, e);
+            
+            // If both players fail, ensure download link is visible
+            nativePlayer.style.display = 'none';
+            downloadContainer.style.display = 'block';
+        });
+        
+        // For native player, also track if it plays successfully
+        nativePlayer.addEventListener('playing', function() {
+            console.log('Native player is playing successfully!');
+            // Hide the download container if native player is playing
+            downloadContainer.style.display = 'none';
+        });
+        
+        // Add a timeout check to ensure video starts playing
+        setTimeout(function() {
+            if ((player.paused() && !videoPlaybackFailed && player.readyState() < 2) || 
+                player.error() != null) {
+                console.log('Video failed to start playing after timeout, readyState:', player.readyState());
+                videoPlaybackFailed = true;
+                showFallbacks();
+            }
+        }, 5000); // 5 second timeout
+        
+        // Add an additional check for video src loading
+        var videoElement = document.querySelector('#emotion-video source');
+        videoElement.addEventListener('error', function(e) {
+            console.error('Source element error:', e);
+            videoPlaybackFailed = true;
+            showFallbacks();
+        });
+    </script>
+</body>
+</html>

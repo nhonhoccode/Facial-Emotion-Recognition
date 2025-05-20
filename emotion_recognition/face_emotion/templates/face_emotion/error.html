@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lỗi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 5rem;
+        }
+        .error-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .error-icon {
+            font-size: 4rem;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+            margin-top: 1rem;
+        }
+        .btn-primary:hover {
+            background-color: #5649c0;
+            border-color: #5649c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-container">
+            <div class="error-icon">❌</div>
+            <h1>Đã xảy ra lỗi</h1>
+            <p class="lead">Rất tiếc, đã có lỗi xảy ra trong quá trình xử lý.</p>
+            
+            {% if error %}
+            <div class="alert alert-danger mt-3">
+                <strong>Chi tiết lỗi:</strong> {{ error }}
+            </div>
+            {% endif %}
+            
+            <a href="{% url 'home' %}" class="btn btn-primary">Trở về trang chủ</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
